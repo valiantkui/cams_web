@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>班级资料管理</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="icon" href="../img/logo2.png" >
+   <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		.position{
+			float:right;
+		}
+	</style>
+	<script>
+		var $current;
+		$(function(){
+			$current=$("#current");
+		});
+		function loadContent(t){
+			//alert(t.innerHTML)
+			var flag = t.innerText;
+			$current.parent().removeClass("active");
+			$current=$(t);
+			//alert($current.parent());
+			$current.parent().addClass("active");
+			
+
+		}
+	</script>
+	
+	
+	</head>
+	<body>
+		<!--导航栏-->
+			<div id="header">
+				<script>
+					$("#header").load("5header.html");
+				</script>
+			</div>
+	<div class="container">
+		
+		<div class="body_content" style="height: 800px;">
+  <h2 class="h2_body" style="text-align: left;">班级资料</h2>
+  <div class="position">
+		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" >修改密码</button>
+		
+		</div>
+		<div class="modal fade bs-example-modal-md" id="myModal" role="dialog" aria-labal="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-md">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">修改密码</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form>
+							<div class="form-group">
+								<label class="control-label">原密码</label>
+								<input type="password" placeholder="原密码" class="form-control">
+							</div>
+							<div class="form-group">
+								<label class="control-label">新密码</label>
+								<input type="password" placeholder="新密码" class="form-control">
+							</div>
+							<div class="form-group">
+								<label class="control-label">确认新密码</label>
+								<input type="password" placeholder="确认新密码" class="form-control">
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-md" data-dismiss="modal">
+							关闭
+						</button>
+						<button type="button" class="btn btn-success btn-md" onclick="window.location='5c_data.html'">
+							确认
+						</button>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+  <br><br>
+  <div  style="margin: 0px 250px;">
+  	
+  <form style="width: 600px;">
+  <div class="form-group">
+    <label for="exampleInputEmail1">班级编号</label>
+    <input type="number" class="form-control" id="exampleInputEmail1" placeholder="班级编号" disabled>
+  </div>
+  
+  <div class="form-group">
+    <label for="exampleInputPassword1">班级名称</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="班级名称">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">入学年份</label>
+    <input type="number" class="form-control" id="exampleInputEmail1" placeholder="入学年份" disabled>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">所属学校</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="所属学校">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">所属专业</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="所属专业">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">班级图片显示</label>
+    <img src="../img/logo1.png">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">更改的图片</label>
+    <input type="file" class="form-control" id="exampleInputEmail1" placeholder="更改的图片">
+  </div>
+  
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+  </div>
+</div>
+
+    </div>
+   </div>
+    
+		<div id="footer">
+			<script>$("#footer").load("footer.html")</script>
+		</div>
+
+</div>
+	</body>
+</html>

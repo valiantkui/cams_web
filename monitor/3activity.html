@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>活动管理</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="icon" href="../img/logo2.png" >
+   <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		.position{
+			float:right;
+		}
+	</style>
+	<script>
+		var $current;
+		$(function(){
+			$current=$("#current");
+		});
+		function loadContent(t){
+			//alert(t.innerHTML)
+			var flag = t.innerText;
+			$current.parent().removeClass("active");
+			$current=$(t);
+			//alert($current.parent());
+			$current.parent().addClass("active");
+			
+
+		}
+	</script>
+	
+	
+	</head>
+	<body>
+		<!--导航栏-->
+			<div id="header">
+				<script>
+					$("#header").load("3header.html");
+				</script>
+			</div>
+	<div class="container">
+		
+		<div class="body_content" style="height: 1200px;">
+
+    <h2 class="h2_body">活动展示</h2><br><br>
+    
+    
+    <div style="margin-left: 20px;margin-right: 20px;">
+    	<form class="navbar-form navbar-left">
+    		
+        <div class="form-group" >
+          <input type="text" class="form-control" placeholder="TitleSearch" style="width: 300px;float: left;">
+          	<button type="submit" class="btn btn-default" style="margin-bottom: 10px;margin-left: 10px;margin-right: 10px;float: left;">Submit</button>
+        </div>
+        
+        
+        <div class="form-group">
+          <input type="date" class="form-control" placeholder="TimeSearch" style="width: 200px;float: left;">
+        </div>
+        <button type="submit" class="btn btn-default" style="margin-bottom: 10px;margin-left: 10px;">Submit</button>
+        
+      </form>
+    </div>
+    <div class="row " style="text-align: center">
+    	<div class="container">
+ 
+  <p>查询结果：</p>            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>活动公告</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+       <td><a href="#" style="font-size: 20px;">寒假义务支教正在招募</a></td>
+        <td>
+        	
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+      <tr>
+        
+        <td><a href="#" style="font-size: 20px;">关于赴澳洲游学项目咨询会议通知</a></td>
+        <td>
+        	
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+      <tr>
+        
+        <td><a href="#" style="font-size: 20px;">郑州大学暑假夏令营活动火热进行中</a></td>
+        <td>
+        	
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+    <div >            
+  <ul class="pagination" style="margin-left: 400px;">
+    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+  </div> 
+  <div class="divider">
+  <hr style="filter: progid:dximagetransform.microsoft.glow(color="#987cb9",strength=10) " width="100%" color="#987cb9" size=1>
+  	<hr style="filter: progid:dximagetransform.microsoft.glow(color="#987cb9",strength=10)" width="100%" color="#987cb9" size=1>
+  	</div>
+  <h2 class="h2_body" style="text-align: left;">活动发布页面</h2><br><br>
+  <div  style="margin: 0px 250px;">
+  	
+  <form style="width: 600px;">
+  <div class="form-group">
+    <label for="exampleInputEmail1">标题</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="题目">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">文本内容</label>
+    <textarea class="form-control" rows="3" placeholder="文本内容"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">活动编号</label>
+    <input type="number" class="form-control" id="exampleInputEmail1" placeholder="活动编号">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">开始时间</label>
+    <input type="date" class="form-control" id="exampleInputPassword1" >
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">结束时间</label>
+    <input type="date" class="form-control" id="exampleInputPassword1" >
+  </div>
+  
+  
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+  </div>
+</div>
+
+    </div>
+   </div>
+    
+		<div id="footer">
+			<script>$("#footer").load("footer.html")</script>
+		</div>
+
+</div>
+	</body>
+</html>

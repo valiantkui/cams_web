@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>学生资料管理</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="icon" href="../img/logo2.png" >
+   <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		.position{
+			float:right;
+		}
+	</style>
+	<script>
+		var $current;
+		$(function(){
+			$current=$("#current");
+		});
+		function loadContent(t){
+			//alert(t.innerHTML)
+			var flag = t.innerText;
+			$current.parent().removeClass("active");
+			$current=$(t);
+			//alert($current.parent());
+			$current.parent().addClass("active");
+			
+
+		}
+	</script>
+	
+	
+	</head>
+	<body>
+		<!--导航栏-->
+			<div id="header">
+				<script>
+					$("#header").load("1header.html");
+				</script>
+			</div>
+	<div class="container">
+		
+		<div class="body_content">
+
+    <h2 class="h2_body">学生资料查询</h2><br><br>
+    
+    
+    <div style="width: 200px;margin-left: 20px;margin-right: 20px;float: left;">
+    	<form>
+  <div class="form-group">
+    <label for="exampleInputEmail1">学号</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="s_id">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">姓名</label>
+    <input type="text" class="form-control" id="exampleInputPassword1" placeholder="name">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">职位</label>
+    <input type="text" class="form-control" id="exampleInputPassword1" placeholder="post">
+  </div>
+  
+  <button type="submit" class="btn btn-success">提交</button>
+</form>
+    </div>
+    <div class="row " style="text-align: center">
+    	<div class="container">
+ 
+  <p>查询结果：</p>            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>学号</th>
+        <th>姓名</th>
+        <th>职位</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>20152470426</td>
+        <td>Doe</td>
+        <td>班委</td>
+        <td>
+        	<button class="btn btn-success" type="button">修改</button>
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+      <tr>
+        <td>20152470426</td>
+        <td>Doe</td>
+        <td>班委</td>
+        <td>
+        	<button class="btn btn-success" type="button">修改</button>
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+      <tr>
+        <td>20152470426</td>
+        <td>Doe</td>
+        <td>班委</td>
+        <td>
+        	<button class="btn btn-success" type="button">修改</button>
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+    <div >            
+  <ul class="pagination" style="margin-left: 300px;">
+    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+  </div> 
+</div>
+
+    </div>
+   </div>
+    
+		<div id="footer">
+			<script>$("#footer").load("footer.html")</script>
+		</div>
+
+</div>
+	</body>
+</html>

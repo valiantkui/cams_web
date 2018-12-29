@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>课程表管理</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="icon" href="../img/logo2.png" >
+   <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		.position{
+			float:right;
+		}
+	</style>
+	<script>
+		var $current;
+		$(function(){
+			$current=$("#current");
+		});
+		function loadContent(t){
+			//alert(t.innerHTML)
+			var flag = t.innerText;
+			$current.parent().removeClass("active");
+			$current=$(t);
+			//alert($current.parent());
+			$current.parent().addClass("active");
+			
+
+		}
+	</script>
+	
+	
+	</head>
+	<body>
+		<!--导航栏-->
+			<div id="header">
+				<script>
+					$("#header").load("2header.html");
+				</script>
+			</div>
+	<div class="container">
+		
+		<div class="body_content" style="height: 800px;">
+
+    <h2 class="h2_body">课程表展示</h2><br><br>
+    
+    
+    <div style="width: 200px;margin-left: 20px;margin-right: 20px;float: left;">
+    	<form>
+  <div class="form-group">
+    <label for="exampleInputEmail1">课表名</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="syllabus_name">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">学期选择</label>
+    <select class="form-control" id="sel1">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+        <option>7</option>
+        <option>8</option>
+      </select>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">图片文件添加</label>
+    <input type="file" class="form-control" id="exampleInputPassword1" placeholder="Photos">
+  </div>
+  
+  <button type="submit" class="btn btn-success">提交</button>
+</form>
+    </div>
+    <div class="row " style="text-align: center">
+    	<div class="container" >
+ 
+  <div id="syllabus">
+  	<img src="../img/syllabusphoto1.PNG">
+  	
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto1.html')">1</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto2.html')">2</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto3.html')">3</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto4.html')">4</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto5.html')">5</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto6.html')">6</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto7.html')">7</button></th>
+        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto8.html')">8</button></th>
+        
+      </tr>
+    </thead>
+ 
+  </table>
+    <div >            
+  <button class="btn btn-danger btn-lg">删除</button>
+  </div> 
+
+</div>
+
+    </div>
+   </div>
+    
+		<div id="footer">
+			<script>$("#footer").load("footer.html")</script>
+		</div>
+
+</div>
+	</body>
+</html>

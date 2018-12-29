@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>团购管理</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="icon" href="../img/logo2.png" >
+   <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		.position{
+			float:right;
+		}
+	</style>
+	<script>
+		var $current;
+		$(function(){
+			$current=$("#current");
+		});
+		function loadContent(t){
+			//alert(t.innerHTML)
+			var flag = t.innerText;
+			$current.parent().removeClass("active");
+			$current=$(t);
+			//alert($current.parent());
+			$current.parent().addClass("active");
+			
+
+		}
+	</script>
+	<script>
+		function group_Goods(){
+			
+			var last_input_good=$("#group_goods>input:last").val();
+			var last_input_price = $("#group_price>input:last").val();
+			if(last_input_good.trim() != "" && last_input_price.trim() != ""){
+				
+			/*	var create_input = document.createElement("input");
+				$(create_input).addClass("form-control");//添加类属性*/
+//				create_input.class="form-control";
+//				create_input.id="exampleInputEmail1";
+//				create_input.style="align:left";
+				$("#addGoods").before("<input type='text' class='form-control' />");//button上一个元素添加
+				$("#group_price").append("<input type='number' class='form-control' />");
+				
+			}
+			
+			
+			
+		}
+	</script>
+	
+	</head>
+	<body>
+		<!--导航栏-->
+			<div id="header">
+				<script>
+					$("#header").load("4header.html");
+				</script>
+			</div>
+	<div class="container">
+		
+		<div class="body_content" style="height: 1500px;">
+
+    <h2 class="h2_body">团购展示</h2><br><br>
+    
+    
+    <div style="margin-left: 20px;margin-right: 20px;">
+    	<form class="navbar-form navbar-left">
+    		
+        <div class="form-group" >
+          <input type="text" class="form-control" placeholder="TitleSearch" style="width: 300px;float: left;">
+          	<button type="submit" class="btn btn-default" style="margin-bottom: 10px;margin-left: 10px;margin-right: 10px;float: left;">Submit</button>
+        </div>
+        
+        
+        <div class="form-group">
+          <input type="date" class="form-control" placeholder="TimeSearch" style="width: 200px;float: left;">
+        </div>
+        <button type="submit" class="btn btn-default" style="margin-bottom: 10px;margin-left: 10px;">Submit</button>
+        
+      </form>
+    </div>
+    <div class="row " style="text-align: center">
+    	<div class="container">
+ 
+  <p>查询结果：</p>            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>活动公告</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+       <td><a href="4_message.html" style="font-size: 20px;">紧急紧急！！团购JAVA书</a></td>
+        <td>
+        	
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+      <tr>
+        
+        <td><a href="#" style="font-size: 20px;">关于团购联想i7-5500电脑通知</a></td>
+        <td>
+        	
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+      <tr>
+        
+        <td><a href="#" style="font-size: 20px;">寝室团购卫生纸和洗衣液</a></td>
+        <td>
+        	
+        	<button class="btn btn-danger" type="button">删除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+    <div >            
+  <ul class="pagination" style="margin-left: 400px;">
+    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+  </div> 
+  <div class="divider">
+  <hr style="filter: progid:dximagetransform.microsoft.glow(color="#987cb9",strength=10) " width="100%" color="#987cb9" size=1>
+  	<hr style="filter: progid:dximagetransform.microsoft.glow(color="#987cb9",strength=10)" width="100%" color="#987cb9" size=1>
+  	</div>
+  <h2 class="h2_body" style="text-align: left;">团购发布页面</h2><br><br>
+  <div  style="margin: 0px 250px;">
+  	
+  <form style="width: 600px;">
+  <div class="form-group">
+    <label for="exampleInputEmail1">标题</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="题目">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">文本内容</label>
+    <textarea class="form-control" rows="3" placeholder="文本内容"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">商品类别</label>
+    <select class="form-control" id="sel1">
+        <option>日常用品</option>
+        <option>学习用品</option>
+        <option>电子设备</option>
+        <option>鲜美果蔬</option>
+        <option>零食小铺</option>
+        <option>消遣娱乐</option>
+        <option>其他</option>
+        
+      </select>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">截止时间</label>
+    <input type="date" class="form-control" id="exampleInputPassword1" >
+  </div>
+  <div class="form-group">
+  	<div class="row">
+  	<div class="col-md-9 col-sm-12">
+    <label for="exampleInputEmail1">团购物品输入</label>
+    <div id="group_goods">
+    	<input type="text" class="form-control"/>
+    	<button class="btn btn-success btn-md" type="button" id="addGoods" onclick="group_Goods()">添加</button><br />
+	    <!--<input type="text" class="form-control" id="exampleInputEmail1" placeholder="请填写一件团购物品">
+	    <button class="btn btn-success btn-md" type="button" onclick="group_Goods()" >添加物品</button><br />-->
+    </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-12">
+    <label for="exampleInputEmail1">单价</label>
+    <div id="group_price">
+    	<input type="number" class="form-control"/>
+    </div>
+    </div>
+    
+    </div>
+  </div>
+  
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+  </div>
+</div>
+
+    </div>
+   </div>
+    
+		<div id="footer">
+			<script>$("#footer").load("footer.html")</script>
+		</div>
+
+</div>
+	</body>
+</html>
