@@ -3,6 +3,16 @@
   height: 0px;
   margin-left:60px;
 }
+
+.padding_vertical{
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.text_center{
+  text-align: center;
+}
+
 *{
   margin: 0px;
   padding: 0px;

@@ -14,6 +14,7 @@ var classInfo = null;
         success:function(result){
             //alert(result);
            classInfo = $.parseJSON(result);
+            $("#classInfo").text(classInfo.name+"已登陆");
            /*alert(classInfo.name);
            alert(classInfo.school);*/
         },
