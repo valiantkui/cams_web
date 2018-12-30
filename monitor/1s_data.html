@@ -6,18 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="icon" href="../img/logo2.png" >
    <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
- <!-- <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
   <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
-  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>-->
-    <script src="../js/jquery.min.js"></script>
-    <link href="../css/bootstrap.min.css">
+  <!--<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>-->
 
-    <script src="../js/popper.min.js"></script>
-    <script src="../js/bootstrap.min.js"></script>
-
+   <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+-->
 	<script>
-
+        $.ajaxSetup({
+            xhrFields: {
+                //允许带上凭据
+                withCredentials: true
+            },
+            crossDomain: true,
+        });
 
 
 
@@ -25,7 +31,7 @@
 		$(function(){
 			$current=$("#current");
 
-
+            findCurrentClassStudent();
 
 
 		});
@@ -39,6 +45,104 @@
 			
 
 		}
+
+
+		function addStudent(){
+		    var s_id = $("#s_id").val();
+		    var name = $("#name").val();
+		    var post = $("#post").val();
+
+		    if(s_id=="" || name=="" || post==""){
+
+		        $("#add_student_message").text("请输入完整");
+		        $("#add_student_message").css({"color":"red"});
+
+		        return false;
+            }
+
+
+
+            //var formdata = new FormData(document.getElementById("add_sudent_form"));
+            $.ajax({
+                url: "http://localhost:8880/class/addStudent",
+                type: "post",
+                data: {"s_id":s_id,"name":name,"post":post},
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                        alert("添加成功");
+                        findCurrentClassStudent();
+
+                    }else{
+                        $("#add_student_message").text("添加失败，请重新尝试...");
+                        $("#add_student_message").css({"color":"red"});
+                    }
+                },
+                error: function (e) {
+                    alert("网络错误");
+                }
+
+            });
+        }
+
+
+        function findCurrentClassStudent(){
+            $.ajax({
+               url: "http://localhost:8880/class/findCurrentClassStudent",
+               type: "get",
+               dataType: "text",
+               success: function (result) {
+                    //alert(result);
+                   generateStudent($.parseJSON(result));
+               },
+                error: function (e) {
+                    alert("错误");
+                }
+
+            });
+        }
+        function generateStudent(studentList){
+            $("#student_panel").empty();
+            for(var i = 0;i<studentList.length;i++){
+                var student = studentList[i];
+
+                var tr = document.createElement("tr");
+                var td1 = document.createElement("td");
+                var td2 = document.createElement("td");
+                var td3 = document.createElement("td");
+                var td4 = document.createElement("td");
+                $(td1).text(student.s_id);
+                $(td2).text(student.name);
+                $(td3).text(student.post);
+                $(td4).append("<button onclick='updateStudent("+student.s_id+")' class='btn btn-success'>修改</button><button onclick='deleteStudent("+student.s_id+")' class='btn btn-danger'>删除</button>");
+                $(tr).append(td1,td2,td3,td4);
+                $("#student_panel").append(tr);
+            }
+        }
+
+        function deleteStudent(s_id){
+		    alert(s_id);
+		    $.ajax({
+                url: "http://localhost:8880/class/deleteStudentByS_id?s_id="+s_id,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                        findCurrentClassStudent();
+                    }else if(result =="s_id_false"){
+                        alert("您要删除的学生账号不存在");
+                    }else{
+                        alert("错误");
+                    }
+
+                },
+                error: function (e){
+                    alert("错误！！");
+                }
+            })
+
+        }
+
 	</script>
 	
 	
@@ -58,21 +162,24 @@
                     <div class="row container-fluid">
                         <div class="col-12 col-md-4" >
 
-                            <form>
+                            <form id="add_student_form">
                                   <div class="form-group">
                                     <label for="exampleInputEmail1">学号</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="s_id">
+                                    <input type="text" name="s_id" id="s_id" class="form-control" id="exampleInputEmail1" placeholder="s_id">
                                   </div>
                                   <div class="form-group">
                                     <label for="exampleInputPassword1">姓名</label>
-                                    <input type="text" class="form-control" id="exampleInputPassword1" placeholder="name">
+                                    <input type="text" name="name" id="name" class="form-control" id="exampleInputPassword1" placeholder="name">
                                   </div>
                                   <div class="form-group">
                                     <label for="exampleInputPassword1">职位</label>
-                                    <input type="text" class="form-control" id="exampleInputPassword1" placeholder="post">
+                                    <input type="text" name="post" id="post" class="form-control" id="exampleInputPassword1" placeholder="post">
                                   </div>
 
-                                  <button type="submit" class="btn btn-success">提交</button>
+                                  <button type="button" onclick="addStudent()" class="btn btn-success">提交</button>
+                                    <span id="add_student_message">
+
+                                    </span>
                             </form>
                         </div>
 
@@ -91,7 +198,8 @@
                                         <th>操作</th>
                                       </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="student_panel">
+                                    <!--
                                       <tr>
                                         <td>20152470426</td>
                                         <td>Doe</td>
@@ -100,25 +208,7 @@
                                             <button class="btn btn-success" type="button">修改</button>
                                             <button class="btn btn-danger" type="button">删除</button>
                                         </td>
-                                      </tr>
-                                      <tr>
-                                        <td>20152470426</td>
-                                        <td>Doe</td>
-                                        <td>班委</td>
-                                        <td>
-                                            <button class="btn btn-success" type="button">修改</button>
-                                            <button class="btn btn-danger" type="button">删除</button>
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>20152470426</td>
-                                        <td>Doe</td>
-                                        <td>班委</td>
-                                        <td>
-                                            <button class="btn btn-success" type="button">修改</button>
-                                            <button class="btn btn-danger" type="button">删除</button>
-                                        </td>
-                                      </tr>
+                                      </tr>-->
                                     </tbody>
                                   </table>
                                     <div class="col-12">
