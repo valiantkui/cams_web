@@ -32,9 +32,32 @@
   </div>
   <div class="position" >
     <span id="classInfo"></span>
-  	<button type="button" class="btn btn-default btn-md"  id="sign_out" onclick="window.location='SignInUp.html'">Sign out</button>
+  	<button type="button" class="btn btn-default btn-md"  id="sign_out" onclick="SignOut()">退出登陆</button>
   </div>
   <!--登录 按钮-->
   
  
 	</nav>
+<script>
+  function SignOut(){
+    $.ajax({
+      url: "http://localhost:8880/login/classLogout",
+      type: "get",
+      dataType: "text",
+      success: function (result) {
+        if(result == "true"){
+          window.location="SignInUp.html";
+        }else{
+          alert("退出失败");
+        }
+      },
+      error: function(e){
+        alert("网络异常");
+      }
+
+
+
+    })
+  }
+
+</script>

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
 <head>
   <title>学生资料管理</title>
@@ -46,8 +46,37 @@
 
 		}
 
+		var s_id_ok = false;
+		function checkS_id() {
+
+            var s_id = $("#s_id").val();
+           // alert(s_id);
+            if(s_id.trim()=="")  return false;
+
+            $.ajax({
+                url: "http://localhost:8880/class/checkS_id?s_id="+s_id,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                        $("#s_id_message").text("学号可以使用");
+                        $("#s_id_message").css({color:"green"});
+                        s_id_ok=true;
+
+                    }else{
+                        $("#s_id_message").text("学号已存在");
+                        $("#s_id_message").css({color:"red"});
+                    }
+                },
+                error: function (e) {
+                    alert("错误");
+                }
+
+            })
+        }
 
 		function addStudent(){
+		    //alert("test")
 		    var s_id = $("#s_id").val();
 		    var name = $("#name").val();
 		    var post = $("#post").val();
@@ -60,6 +89,12 @@
 		        return false;
             }
 
+		    if(!s_id_ok){
+                $("#add_student_message").text("学号不能使用");
+                $("#add_student_message").css({"color":"red"});
+
+                return false;
+            }
 
 
             //var formdata = new FormData(document.getElementById("add_sudent_form"));
@@ -114,14 +149,19 @@
                 $(td1).text(student.s_id);
                 $(td2).text(student.name);
                 $(td3).text(student.post);
-                $(td4).append("<button onclick='updateStudent("+student.s_id+")' class='btn btn-success'>修改</button><button onclick='deleteStudent("+student.s_id+")' class='btn btn-danger'>删除</button>");
+                var button1 = document.createElement("button");
+                $(button1).text("修改");
+                $(button1).addClass("btn btn-success");
+                $(button1).click({s_id:student.s_id,name:student.name,post:student.post},updateStudent);
+                $(td4).append(button1);
+                $(td4).append("<button onclick='deleteStudent("+student.s_id+")' class='btn btn-danger'>删除</button>");
                 $(tr).append(td1,td2,td3,td4);
                 $("#student_panel").append(tr);
             }
         }
 
         function deleteStudent(s_id){
-		    alert(s_id);
+		    //alert(s_id);
 		    $.ajax({
                 url: "http://localhost:8880/class/deleteStudentByS_id?s_id="+s_id,
                 type: "get",
@@ -140,6 +180,55 @@
                     alert("错误！！");
                 }
             })
+
+        }
+
+        function updateStudent(e){
+		    //alert(e.data.s_id);
+           $("#update_student_panel").show();
+           $("#s_id2").val(e.data.s_id);
+           $("#name2").val(e.data.name);
+           $("#post2").val(e.data.post);
+
+
+
+        }
+
+        function doUpdateStudent(){
+            var s_id = $("#s_id2").val();
+            var name = $("#name2").val();
+            var post = $("#post2").val();
+
+
+            if(s_id=="" || name=="" || post==""){
+
+                $("#update_student_message").text("请输入完整");
+                $("#update_student_message").css({"color":"red"});
+
+                return false;
+            }
+            $("#update_student_message").text("正在修改...");
+            $("#update_student_message").css({"color":"green"});
+            var student = new Object();
+            student.s_id= s_id;
+            student.name=name;
+            student.post=post;
+            $.ajax({
+
+                url: "http://localhost:8880/class/updateStudentByClass",
+                type: "post",
+                data: {"stuJson":JSON.stringify(student)},
+                success: function (result) {
+                    alert(result);
+                    if(result =="true"){
+                        $("#update_student_panel").hide(500);
+                        findCurrentClassStudent();
+                    }
+                },
+                error: function (e) {
+                    alert("错误");
+                }
+            });
 
         }
 
@@ -164,19 +253,19 @@
 
                             <form id="add_student_form">
                                   <div class="form-group">
-                                    <label for="exampleInputEmail1">学号</label>
-                                    <input type="text" name="s_id" id="s_id" class="form-control" id="exampleInputEmail1" placeholder="s_id">
+                                    <label for="exampleInputEmail1">学号</label><span id="s_id_message"></span>
+                                    <input type="text" name="s_id" id="s_id" class="form-control" onblur="checkS_id()"  placeholder="s_id">
                                   </div>
                                   <div class="form-group">
                                     <label for="exampleInputPassword1">姓名</label>
-                                    <input type="text" name="name" id="name" class="form-control" id="exampleInputPassword1" placeholder="name">
+                                    <input type="text" name="name" id="name" class="form-control"  placeholder="name">
                                   </div>
                                   <div class="form-group">
                                     <label for="exampleInputPassword1">职位</label>
-                                    <input type="text" name="post" id="post" class="form-control" id="exampleInputPassword1" placeholder="post">
+                                    <input type="text" name="post" id="post" class="form-control"  placeholder="post">
                                   </div>
 
-                                  <button type="button" onclick="addStudent()" class="btn btn-success">提交</button>
+                                  <button type="button" onclick="addStudent()" class="btn btn-success">添加</button>
                                     <span id="add_student_message">
 
                                     </span>
@@ -224,8 +313,32 @@
 
                     </div>
 
+                <div id="update_student_panel" class="bg-white" style="position: fixed; top: 20%;left: 0px;display: none; padding: 2rem;">
+
+                    <form id="update_student_form">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">学号</label>
+                            <input type="text" name="s_id" id="s_id2" class="form-control" readonly  placeholder="s_id">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">姓名</label>
+                            <input type="text" name="name" id="name2" class="form-control"  placeholder="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">职位</label>
+                            <input type="text" name="post" id="post2" class="form-control"  placeholder="post">
+                        </div>
+
+                        <button type="button" onclick="doUpdateStudent()" class="btn btn-success">修改</button>
+                        <button type="button" onclick="$('#update_student_panel').fadeOut(500)" class="btn btn-success">取消</button>
+                        <span id="update_student_message">
+
+                                    </span>
+                    </form>
+                </div>
 
         </div>
+
 
 
         <div id="footer">

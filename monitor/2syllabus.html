@@ -17,7 +17,7 @@
 	</style>
 	<script>
 		var $current;
-		$(function(){
+		$(function(){//当整个页面加载完之后执行此方法
 			$current=$("#current");
 		});
 		function loadContent(t){
@@ -27,9 +27,51 @@
 			$current=$(t);
 			//alert($current.parent());
 			$current.parent().addClass("active");
-			
-
 		}
+
+
+		function addSubject(){
+		    var last_input = $("#subject_group>input:last");
+		    if(last_input.val().trim() == "") return;
+
+		    last_input[0].readOnly="true";
+            $("#subject_group").append('<input type="text" class="form-control" name="subject" placeholder="学科">');
+
+        }
+
+
+        function doSubmit(){
+            var name = $("#name").val();
+            var term = $("#term").val();
+            if($("#name").val().trim() == "" || $("#term").val().trim() == "" || $("#file").val().trim() == ""){
+                $("#message").text("请输入完整");
+                $("#message").css({color:"red"});
+                return false;
+            }
+
+            var formdata = new FormData(document.getElementById("form"));
+            $.ajax({
+               url: "http://localhost:8880/class/addSyllabus",
+                type: "post",
+                data: formdata,
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                        alert("添加成功");
+                    }else{
+                        $("#message").text("添加失败");
+                        $("#message").css({color:"red"});
+                    }
+                },
+                error: function(e){
+                   alert("错误");
+                }
+
+            });
+            return true;
+
+
+        }
 	</script>
 	
 	
@@ -41,76 +83,79 @@
 					$("#header").load("2header.html");
 				</script>
 			</div>
-	<div class="container">
-		
-		<div class="body_content" style="height: 800px;">
 
-    <h2 class="h2_body">课程表展示</h2><br><br>
-    
-    
-    <div style="width: 200px;margin-left: 20px;margin-right: 20px;float: left;">
-    	<form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">课表名</label>
-    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="syllabus_name">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">学期选择</label>
-    <select class="form-control" id="sel1">
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>6</option>
-        <option>7</option>
-        <option>8</option>
-      </select>
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">图片文件添加</label>
-    <input type="file" class="form-control" id="exampleInputPassword1" placeholder="Photos">
-  </div>
-  
-  <button type="submit" class="btn btn-success">提交</button>
-</form>
-    </div>
-    <div class="row " style="text-align: center">
-    	<div class="container" >
- 
-  <div id="syllabus">
-  	<img src="../img/syllabusphoto1.PNG">
-  	
-  </div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto1.html')">1</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto2.html')">2</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto3.html')">3</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto4.html')">4</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto5.html')">5</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto6.html')">6</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto7.html')">7</button></th>
-        <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto8.html')">8</button></th>
-        
-      </tr>
-    </thead>
- 
-  </table>
-    <div >            
-  <button class="btn btn-danger btn-lg">删除</button>
-  </div> 
+		<div class="container-fluid body_content" >
 
-</div>
+                <h2 class="h2_body">课程表展示</h2><br/><br/>
 
-    </div>
+                <div class="row">
+
+                    <div class="col-12 col-md-4">
+                        <form id="form">
+                              <div class="form-group">
+                                <label for="name">课表名</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="syllabus_name">
+                              </div>
+                              <div class="form-group">
+                                <label for="term">学期选择</label>
+                                <select class="form-control" id="term" name="term" >
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                  </select>
+                              </div>
+                                  <div class="form-group" id="subject_group">
+                                    <label for="exampleInputPassword1">请添加本学期所有学科</label><button type="button" class="btn btn-success" onclick="addSubject()">添加学科</button>
+                                    <input type="text" class="form-control" name="subject" placeholder="学科">
+                                  </div>
+                              <div class="form-group">
+                                <label for="exampleInputPassword1">图片文件添加</label>
+                                <input type="file" class="form-control" id="file" name="file" placeholder="Photos">
+                              </div>
+
+                              <button type="button" onclick="doSubmit()" class="btn btn-success">提交</button>
+                            <span id="message">
+
+                            </span>
+                        </form>
+                    </div>
+                    <div class="col-12 col-md-8" style="text-align: center">
+
+
+                              <div id="syllabus">
+                                <img src="../img/syllabusphoto1.PNG">
+                              </div>
+                              <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto1.html')">1</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto2.html')">2</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto3.html')">3</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto4.html')">4</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto5.html')">5</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto6.html')">6</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto7.html')">7</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto8.html')">8</button></th>
+
+                                  </tr>
+                                </thead>
+
+                              </table>
+
+                            <button class="btn btn-danger btn-lg">删除</button>
+                    </div>
+                </div>
+        </div>
    </div>
     
 		<div id="footer">
 			<script>$("#footer").load("footer.html")</script>
 		</div>
 
-</div>
 	</body>
 </html>
