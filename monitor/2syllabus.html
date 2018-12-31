@@ -7,19 +7,84 @@
    <link rel="icon" href="../img/logo2.png" >
    <link rel="stylesheet" type="text/css" href="../css/1s_data.css">
   <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
-  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <!--<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>-->
+    <script
+            src="https://code.jquery.com/jquery-1.12.4.js"
+            integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+            crossorigin="anonymous"></script>
   <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
 		<style>
 		.position{
 			float:right;
 		}
 	</style>
 	<script>
-		var $current;
+
+        $.ajaxSetup({
+            xhrFields: {
+                //允许带上凭据
+                withCredentials: true
+            },
+            crossDomain: true,
+        });
+
+        var $current;
 		$(function(){//当整个页面加载完之后执行此方法
 			$current=$("#current");
+            findSyllabusByTerm(1);
 		});
+
+		function findSyllabusByTerm(term){
+
+		    $.ajax({
+               url: "http://localhost:8880/class/findSyllabusByTerm?term="+term,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                   if(result==""){
+                     //  alert("没有当前学期的课程表："+term);
+                       $("#syllabus_name").text("无");
+                       $("#syllabus_image")[0].src="../img/syllabus_inload.png";
+                       $("#delete_syllabus").unbind("click");
+                   }else{
+
+                    var syllabus = $.parseJSON(result);
+                    $("#syllabus_name").text(syllabus.name);
+                    $("#syllabus_image")[0].src="http://localhost:8880/class/downloadSyllabusImageByS_no?s_no="+syllabus.s_no;
+                    $("#delete_syllabus").unbind("click");
+                    $("#delete_syllabus").click({"s_no":syllabus.s_no},deleteSyllabus);
+                   }
+
+                },
+                error: function(e){
+                   alert("错误！！");
+                }
+
+            });
+        }
+
+        function deleteSyllabus(e){
+           // alert();
+            var s_no = e.data.s_no;
+            $.ajax({
+               url: "http://localhost:8880/class/deleteSyllabusByS_no?s_no="+s_no,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                    //alert(result);
+                    $("#syllabus_name").text("无");
+                    $("#syllabus_image")[0].src="../img/syllabus_inload.png";
+                    $("#delete_syllabus").unbind("click");
+
+                },
+                error: function (e) {
+                    alert("错误");
+                }
+            });
+        }
+
 		function loadContent(t){
 			//alert(t.innerHTML)
 			var flag = t.innerText;
@@ -41,32 +106,32 @@
 
 
         function doSubmit(){
-            var name = $("#name").val();
-            var term = $("#term").val();
             if($("#name").val().trim() == "" || $("#term").val().trim() == "" || $("#file").val().trim() == ""){
                 $("#message").text("请输入完整");
                 $("#message").css({color:"red"});
-                return false;
+                return ;
             }
-
+            alert("提交之前")
             var formdata = new FormData(document.getElementById("form"));
+            alert("提交之后")
             $.ajax({
-               url: "http://localhost:8880/class/addSyllabus",
+                url: "http://localhost:8880/class/addSyllabus",
                 type: "post",
-                data: formdata,
-                dataType: "text",
-                success: function (result) {
-                    if(result == "true"){
-                        alert("添加成功");
+                data:formdata,
+                dataType:"text",
+                processData: false,
+                contentType: false,
+                success:function(result){
+                    if(result=="true"){
+                        alert("提交成功");
                     }else{
-                        $("#message").text("添加失败");
-                        $("#message").css({color:"red"});
+                        alert("异常");
                     }
+                    //alert(result)
                 },
-                error: function(e){
-                   alert("错误");
+                error:function(e){
+                    alert("错误！！");
                 }
-
             });
             return true;
 
@@ -93,6 +158,7 @@
                     <div class="col-12 col-md-4">
                         <form id="form">
                               <div class="form-group">
+                                  <!--name=课程表&term=2&subject=[]-->
                                 <label for="name">课表名</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="syllabus_name">
                               </div>
@@ -119,35 +185,36 @@
                               </div>
 
                               <button type="button" onclick="doSubmit()" class="btn btn-success">提交</button>
-                            <span id="message">
+                                <span id="message">
 
-                            </span>
+                                </span>
                         </form>
                     </div>
                     <div class="col-12 col-md-8" style="text-align: center">
 
 
-                              <div id="syllabus">
-                                <img src="../img/syllabusphoto1.PNG">
+                              <div id="syllabus" style="padding: 0rem 2rem">
+                                  <h4 id="syllabus_name">课程表名</h4>
+                                    <img id="syllabus_image" src="../img/syllabus_inload.png" width="100%"><!--从网上抓取-->
                               </div>
                               <table class="table">
                                 <thead>
                                   <tr>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto1.html')">1</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto2.html')">2</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto3.html')">3</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto4.html')">4</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto5.html')">5</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto6.html')">6</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto7.html')">7</button></th>
-                                    <th><button class="btn btn-default" type="button" onclick="$('#syllabus').load('syllabusPhoto8.html')">8</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(1)">1</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(2)">2</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(3)">3</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(4)">4</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(5)">5</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(6)">6</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(7)">7</button></th>
+                                    <th><button class="btn btn-default" type="button" onclick="findSyllabusByTerm(8)">8</button></th>
 
                                   </tr>
                                 </thead>
 
                               </table>
 
-                            <button class="btn btn-danger btn-lg">删除</button>
+                            <button class="btn btn-danger btn-lg" id="delete_syllabus">删除</button>
                     </div>
                 </div>
         </div>

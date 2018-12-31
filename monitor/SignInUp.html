@@ -70,7 +70,8 @@
 					type: "post",
 					data:formdata,
 					dataType:"text",
-
+					processData: false,
+					contentType: false,
 					success:function(result){
 						if(result=="true"){
 							alert("提交成功,您可以尝试登陆");
