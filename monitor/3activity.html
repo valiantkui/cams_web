@@ -10,15 +10,29 @@
   <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
-		<style>
-		.position{
-			float:right;
-		}
+
+    <style>
+        .position{
+            float:right;
+        }
 	</style>
 	<script>
 		var $current;
+		var currentArg = null;
+
+		var currentFunction = null;
 		$(function(){
 			$current=$("#current");
+			var today = new Date();
+			var month = today.getMonth()+1;
+			if(month<10){
+			    currentArg=today.getFullYear()+"-0"+(today.getMonth()+1);
+            }else{
+
+                currentArg = today.getFullYear()+"-"+(today.getMonth()+1);
+            }
+
+			findActivityByDate(currentArg);
 		});
 		function loadContent(t){
 			//alert(t.innerHTML)
@@ -30,130 +44,355 @@
 			
 
 		}
+
+		function findActivityByDate(d){
+		   // alert(d);
+            $.ajax({
+               url: "http://localhost:8880/activity/findActivityByDate?date="+d,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                   if(result == ""){
+                        $("#activity_panel").text("暂无活动");
+                   }else{
+                       var activityList = $.parseJSON(result);
+                        loadActivity(activityList);
+                   }
+
+                }
+
+            });
+            currentFunction = findActivityByDate;
+        }
+
+        function loadActivity(activityList){
+		    $("#tbody").empty();
+		    //alert(activityList.length);
+		    for(var i= 0;i<activityList.length;i++){
+		        var activity = activityList[i];
+                var tr = document.createElement("tr");
+                var td1 = document.createElement("td");
+                var a = document.createElement("a");
+
+                $(a).text(activity.title);
+                a.href="activity_info.html?a_no="+activity.a_no+"&flag=3";
+                $(a).css({"font-size": "20px"});
+
+                var td2 = document.createElement("td");
+
+                var button1 = document.createElement("button");
+                $(button1).addClass("btn btn-danger");
+                $(button1).text("修改");
+                $(button1).click({"a_no":activity.a_no,"title":activity.title,"content":activity.content,"start_date":activity.start_date,"end_date":activity.end_date},updateActivity);
+                $(td2).append(button1);
+                $(td2).append('<button class="btn btn-danger" onclick="deleteActivity('+activity.a_no+')" type="button">删除</button>');
+                $(td1).append(a);
+                $(tr).append(td1,td2);
+
+                $("#tbody").append(tr);
+            }
+        }
+        function updateActivity(d){
+		    var a_no = d.data.a_no;
+		    var title = d.data.title;
+		    var content = d.data.content;
+		    var start_date = d.data.start_date.split(" ")[0];
+		    var end_date = d.data.end_date.split(" ")[0];
+
+		    $("#update_activity_panel").show(500);
+		    $("#a_no2").val(a_no);
+		    $("#title2").val(title);
+		    $("#content2").val(content);
+		    $("#start_date2").val(start_date);
+		    $("#end_date2").val(end_date);
+
+
+
+        }
+
+        function doUpdateActivity(){
+		    alert("test");
+          var a_no =   $("#a_no2").val();
+          var title =   $("#title2").val();
+          var content =  $("#content2").val();
+          var start_date =   $("#start_date2").val();
+          var end_date =  $("#end_date2").val();
+
+          if(a_no == "" || title=="" || content=="" || start_date=="" || end_date==""){
+            $("#update_activity_message").text("请输入完整");
+            $("#update_activity_message").css({"color":"red"});
+            return;
+          }
+
+
+                $.ajax({
+                    url: "http://localhost:8880/activity/updateActivity",
+                    type:"post",
+                    data: {"a_no":a_no,"title":title,"content":content,"start_date":start_date,"end_date":end_date},
+                    dataType: "text",
+                    success: function (result) {
+                        if(result=="true"){
+                            currentFunction(currentArg);
+                        }else{
+                            alert("更新失败");
+                        }
+
+                    },
+                    error: function (e) {
+                        alert("网络请求失败");
+                    }
+
+                });
+        }
+
+        function deleteActivity(a_no){
+		    //alert("要删除的活动编号:"+a_no);
+
+		    $.ajax({
+               url: "http://localhost:8880/activity/deleteActivityByA_no?a_no="+a_no,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                      //  findActivityByDate(currentArg);
+                        currentFunction(currentArg);
+                    }else{
+                        alert("删除失败，请重试...");
+                    }
+                },
+                error: function (e) {
+                    alert("网络请求失败");
+                }
+
+            });
+        }
+
+		function doSubmit(){
+		    var title = $("#title").val();
+		    var content = $("#content").val();
+		    var start_date = $("#start_date").val();
+		    var end_date = $("#end_date").val();
+
+		    if(title == "" || content=="" || start_date=="" || end_date==""){
+                $("#message").text("请输入完整");
+                $("#message").css({color: "red"});
+                return;
+            }
+
+		    $.ajax({
+                url: "http://localhost:8880/activity/publishActivity",
+                type: "post",
+                dataType: "text",
+                data: {"title":title,"content":content,"start_date":start_date,"end_date":end_date},
+                success: function (result) {
+                    if(result=="true"){
+                        alert("发布成功");
+                        currentFunction(currentArg);
+                    }else{
+                        $("#message").text("发布失败，请重试...");
+                        $("#message").css({color: "red"});
+                    }
+                },
+                error: function (e) {
+                    alert("错误");
+                }
+
+            });
+
+        }
+
+
+        function searchTitle(){
+		    var title = $("#search_title").val();
+		    if(title.trim()=="") return;
+
+            $.ajax({
+               url: "http://localhost:8880/activity/searchActivityByTitle?title="+title,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                   if(result == "") {
+
+                   }else{
+
+                    var activityList = $.parseJSON(result);
+                    loadActivity(activityList);
+                   }
+                },
+                error: function (e) {
+                    alert("网络请求异常");
+                }
+
+            });
+            currentFunction=searchTitle;
+        }
+        function searchDate(){
+            var date = $("#search_date").val();
+            if(date.trim()=="") return;
+
+            $.ajax({
+                url: "http://localhost:8880/activity/searchActivityByDate?date="+date,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                    if(result == "") {
+
+                    }else{
+
+                        var activityList = $.parseJSON(result);
+                        loadActivity(activityList);
+                    }
+                },
+                error: function (e) {
+                    alert("网络请求异常");
+                }
+
+            });
+            currentFunction=searchDate;
+        }
 	</script>
 	
 	
 	</head>
 	<body>
 		<!--导航栏-->
-			<div id="header">
+        <div id="header">
 				<script>
 					$("#header").load("header.html");
 				</script>
-			</div>
-	<div class="container">
+                <script src="../js/checkClassSession.js"></script>
+        </div>
+	    <div class="container-fluid">
 		
-		<div class="body_content" style="height: 1200px;">
+		<div class="body_content bg-white row">
 
-    <h2 class="h2_body">活动展示</h2><br><br>
-    
-    
-    <div style="margin-left: 20px;margin-right: 20px;">
-    	<form class="navbar-form navbar-left">
-    		
-        <div class="form-group" >
-          <input type="text" class="form-control" placeholder="TitleSearch" style="width: 300px;float: left;">
-          	<button type="submit" class="btn btn-default" style="margin-bottom: 10px;margin-left: 10px;margin-right: 10px;float: left;">Submit</button>
-        </div>
-        
-        
-        <div class="form-group">
-          <input type="date" class="form-control" placeholder="TimeSearch" style="width: 200px;float: left;">
-        </div>
-        <button type="submit" class="btn btn-default" style="margin-bottom: 10px;margin-left: 10px;">Submit</button>
-        
-      </form>
-    </div>
-    <div class="row " style="text-align: center">
-    	<div class="container">
- 
-  <p>查询结果：</p>            
-  <table class="table">
-    <thead>
-      <tr>
-        <th>活动公告</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-       <td><a href="#" style="font-size: 20px;">寒假义务支教正在招募</a></td>
-        <td>
-        	
-        	<button class="btn btn-danger" type="button">删除</button>
-        </td>
-      </tr>
-      <tr>
-        
-        <td><a href="#" style="font-size: 20px;">关于赴澳洲游学项目咨询会议通知</a></td>
-        <td>
-        	
-        	<button class="btn btn-danger" type="button">删除</button>
-        </td>
-      </tr>
-      <tr>
-        
-        <td><a href="#" style="font-size: 20px;">郑州大学暑假夏令营活动火热进行中</a></td>
-        <td>
-        	
-        	<button class="btn btn-danger" type="button">删除</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  
-    <div >            
-  <ul class="pagination" style="margin-left: 400px;">
-    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-  </ul>
-  </div> 
-  <div class="divider">
-  <hr style="filter: progid:dximagetransform.microsoft.glow(color="#987cb9",strength=10) " width="100%" color="#987cb9" size=1>
-  	<hr style="filter: progid:dximagetransform.microsoft.glow(color="#987cb9",strength=10)" width="100%" color="#987cb9" size=1>
-  	</div>
-  <h2 class="h2_body" style="text-align: left;">活动发布页面</h2><br><br>
-  <div  style="margin: 0px 250px;">
-  	
-  <form style="width: 600px;">
-  <div class="form-group">
-    <label for="exampleInputEmail1">标题</label>
-    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="题目">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">文本内容</label>
-    <textarea class="form-control" rows="3" placeholder="文本内容"></textarea>
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">活动编号</label>
-    <input type="number" class="form-control" id="exampleInputEmail1" placeholder="活动编号">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">开始时间</label>
-    <input type="date" class="form-control" id="exampleInputPassword1" >
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">结束时间</label>
-    <input type="date" class="form-control" id="exampleInputPassword1" >
-  </div>
-  
-  
-  <button type="submit" class="btn btn-success">Submit</button>
-</form>
-  </div>
-</div>
 
-    </div>
-   </div>
-    
+            <div class="col-12 col-md-4 margin_top">
+                <h2>活动发布页面</h2><br><br>
+                <div >
+
+                    <form id="form">
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">标题</label>
+                            <input type="text" class="form-control" name="title" id="title" placeholder="题目">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">文本内容</label>
+                            <textarea class="form-control" rows="3" name="content" id="content" placeholder="文本内容"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">开始时间</label>
+                            <input type="date" class="form-control" name="start_date" id="start_date" >
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">结束时间</label>
+                            <input type="date" class="form-control" name="end_date" id="end_date" >
+                        </div>
+
+
+                        <button type="button" onclick="doSubmit()" class="btn btn-success">Submit</button>
+                        <span id="message"></span>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 margin_top">
+
+              <h2 >本月活动展示</h2><br><br>
+
+
+                <div class="container-fluid">
+                    <form class="navbar-form navbar-left row">
+
+                        <div class="form-group col-12 col-md-6 row" >
+                          <input type="text" class="form-control col-9" id="search_title" placeholder="TitleSearch">
+                            <button type="button"  onclick="searchTitle()" class="btn btn-default col-3" >Submit</button>
+                        </div>
+
+
+                        <div class="form-group col-12 col-md-6 row">
+                            <input type="date" class="form-control col-9" id="search_date" placeholder="TimeSearch" >
+                            <button type="button"  onclick="searchDate()" class="btn btn-default col-3" >Submit</button>
+                        </div>
+
+                  </form>
+                </div>
+                <div class="row" id="activity_panel">
+
+
+
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>活动公告</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        <!--
+                          <tr>
+
+                            <td><a href="#" style="font-size: 20px;">郑州大学暑假夏令营活动火热进行中</a></td>
+                            <td>
+
+                                <button class="btn btn-danger" type="button">删除</button>
+                            </td>
+                          </tr>-->
+                        </tbody>
+                      </table>
+
+                        <div class="container-fluid">
+                          <ul class="pagination">
+                            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                          </ul>
+                        </div>
+                </div>
+              </div>
+
+
+            </div>
+            <div id="update_activity_panel" class="bg-white" style="position: fixed; top: 20%;left: 0px;display: none; padding: 2rem;">
+
+                <form id="update_activity_form">
+                    <input type="hidden" id="a_no2"/>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">标题</label>
+                        <input type="text"  id="title2" class="form-control"   placeholder="标题">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">内容</label>
+                        <input type="text"  id="content2" class="form-control"  placeholder="内容">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">开始时间</label>
+                        <input type="date"  id="start_date2" class="form-control"  placeholder="开始时间">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">结束时间</label>
+                        <input type="date"  id="end_date2" class="form-control"  placeholder="结束时间">
+                    </div>
+
+                    <button type="button" onclick="doUpdateActivity()" class="btn btn-success">修改</button>
+                    <button type="button" onclick="$('#update_activity_panel').fadeOut(500)" class="btn btn-success">关闭</button>
+                    <span id="update_activity_message">
+
+                                    </span>
+                </form>
+            </div>
+        </div>
+
+
+
 		<div id="footer">
 			<script>$("#footer").load("footer.html")</script>
 		</div>
 
-</div>
+
 	</body>
 </html>
