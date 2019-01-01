@@ -6,24 +6,24 @@ $.ajaxSetup({
     },
     crossDomain: true,
 });
-var classInfo = null;
+var studentInfo = null;
 
     $.ajax({
-        url: "http://localhost:8880/login/checkClassSession",
+        url: "http://localhost:8880/login/checkStudentSession",
         dataType:"text",
         async: false,
         success:function(result){
             if(result == "") {
-                window.location="SignInUp.html";
+                window.location="SignIn.html";
             }
             else {
 
-                classInfo = $.parseJSON(result);
-                $("#classInfo").text(classInfo.name+"已登陆");
+                studentInfo = $.parseJSON(result);
+                $("#studentInfo").text(studentInfo.name+"已登陆");
             }
         },
         error:function (e) {
-            window.location="SignInUp.html";
+            window.location="SignIn.html";
         }
 
     });

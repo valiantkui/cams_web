@@ -14,93 +14,260 @@
 		.position{
 			float:right;
 		}
+
 	</style>
-	<script>
-		var $current;
-		$(function(){
-			$current=$("#current");
-		});
-		function loadContent(t){
-			//alert(t.innerHTML)
-			var flag = t.innerText;
-			$current.parent().removeClass("active");
-			$current=$(t);
-			//alert($current.parent());
-			$current.parent().addClass("active");
-			
-			if(flag == "首页"){
-				$("#img1")[0].src="img/introduction1.PNG";
-				$("#img2")[0].src="img/introduction2.PNG";
-				$("#img3")[0].src="img/introduction3.PNG";
-//				window.location="1Home.html"
-			}else if(flag == "学习园地"){
-				$("#img1")[0].src="img/study1.PNG";
-				$("#img2")[0].src="img/study2.PNG";
-				$("#img3")[0].src="img/study3.PNG";
-//				window.location="2Learning.html"
-			}else if(flag == "团体活动"){
-				$("#img1")[0].src="img/music3.PNG";
-				$("#img2")[0].src="img/photos1.PNG";
-				$("#img3")[0].src="img/photos2.PNG";
-//				window.location="3Group.html"
-			}else if(flag == "书籍订阅"){
-				$("#img1")[0].src="img/book1.PNG";
-				$("#img2")[0].src="img/book2.PNG";
-				$("#img3")[0].src="img/book3.PNG";
-//				window.location="4Book.html"
-			}else if(flag == "党建中心"){
-				$("#img1")[0].src="img/sy1.png";
-				$("#img2")[0].src="img/sy2.png";
-				$("#img3")[0].src="img/sy3.png";
-//				window.location="5Party.html"
-			}else if(flag == "后台管理"){
-				$("#img1")[0].src="img/manage1.PNG";
-				$("#img2")[0].src="img/manage2.PNG";
-				$("#img3")[0].src="img/manage3.PNG";
-//				window.location="6Manage.html"
-			}
-		}
-	</script>
+
+    <script>
+        $(function(){
+           //默认按发布时间排序，显示尚未截至的团购
+            findAllInPurchase();
+
+        });
+        function findAllInPurchase(){
+
+            $.ajax({
+               url: "http://localhost:8880/purchase/findAllInPurchase",
+               type: "get",
+               dataType: "text",
+               success: function (result) {
+                  // alert(result);
+                   if(result != ""){
+
+                        loadPurchase($.parseJSON(result));
+                   }
+               } ,
+                error: function (e) {
+                    alert("网络请求错误");
+                }
+
+            });
+        }
+
+        function loadPurchase(purchaseList){
+            var s_idList = [];
+            for(var i = 0;i<purchaseList.length;i++){
+                var purchase = purchaseList[i];
+                if(purchase.s_id !=null && purchase.s_id != "" && s_idList.indexOf(purchase.s_id) == -1)
+                    s_idList.push(purchase.s_id);
+            }
+
+            var s_idJson = JSON.stringify(s_idList);
+            //alert(s_idJson);
+            $.ajax({
+                url: "http://localhost:8880/student/findStudentByS_idList",
+                type: "post",
+                dataType: "text",
+                data: {"s_idJson":s_idJson},
+                success: function(result){
+                    if(result != ""){
+
+                        loadPurchaseInfo(purchaseList,$.parseJSON(result));
+                    }
+                },
+                error: function (e) {
+                    alert("网络请求异常");
+                }
+            })
+        }
+
+        function loadPurchaseInfo(purchaseList,studentList){
+                $("#purchase_panel").empty();
+                for(var i = 0;i<purchaseList.length;i++){
+                   var student = null;
+                   var purchase = purchaseList[i];
+                   for(var j = 0;j<studentList.length;j++){
+                       if(purchase.s_id==studentList[j].s_id){
+                           student=studentList[j];
+                           break;
+                       }
+                   }
+                   var div_row = document.createElement("div");
+                   $(div_row).addClass("row");
+                   $(div_row).css({"margin-top":"1rem"});
+                   var div_title = document.createElement("div");
+                   $(div_title).addClass("col-4 text-center");
+                   var div_date = document.createElement("div");
+                   $(div_date).addClass("col-4 text-center");
+                   var div_publisher = document.createElement("div");
+                   $(div_publisher).addClass("col-2 text-center");
+                   var div_option = document.createElement("div");
+                   $(div_option).addClass("col-2 text-center");
+                   $(div_title).text(purchase.title);
+                   $(div_date).text(purchase.publish_date.split(" ")[0]+"-"+purchase.end_date.split(" ")[0]);
+
+                   if(student==null){
+                        $(div_publisher).text("班级用户");
+                   }else{
+                       $(div_publisher).text(student.name);
+                   }
+
+
+                   $(div_option).append('<button class="btn btn-success" onclick="purchaseInfo('+purchase.p_no+')">详情</button>');
+                   $(div_row).append(div_title,div_date,div_publisher,div_option);
+                    $("#purchase_panel").append(div_row);
+                }
+        }
+
+        function purchaseInfo(p_no){
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            //alert(maxw+",,"+maxh);
+            $("#purchase_info_panel").css({"position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+
+            $("#purchase_info_panel").show();
+        }
+
+
+        function publishPurchase(){
+
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            //alert(maxw+",,"+maxh);
+            $("#publish_purchase_panel").css({"position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+
+            $("#publish_purchase_panel").show();
+
+
+        }
+        function doPublish(){
+            var title = $("#title").val();
+            var content = $("#title").val();
+            var type = $("#type").val();
+            var end_date = $("#end_date").val();
+
+
+
+
+        }
+    </script>
+
 </head>
 	<body>
 		<!--导航栏-->
 			<div id="header">
 				<script>
-					$("#header").load("header4.html");
+					$("#header").load("header.html");
 				</script>
+                <script src="js/checkStudentSession.js"></script>
 			</div>
 <!--轮播图-->
-<div class="container">
-	<div id="movePhoto">
-<script>$("#movePhoto").load("movePhoto4.html")</script>
-</div>
-<!--文本内容-->
-		<div class="body_content">
+            <div class="container-fluid">
+                <div class="row">
 
-    <h2 class="h2_body">美好书屋</h2><br><br>
-    <p>定书</p><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    <img src="img/课程表.PNG" >
-    <p>定书</p><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    <img src="img/课程表.PNG" >
-    <p>定书</p><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    <img src="img/课程表.PNG" >
-   
-    
-   
+                    <div id="movePhoto" >
+                        <script>$("#movePhoto").load("movePhoto4.html")</script>
+                    </div>
+                </div>
 
-  </div>
+               <div class="row">
+                    <div class="card" style="width:100%">
+                        <div class="card-body" >
+                            <!--默认展现正在进行的团购-->
+                            <div class="row container-fluid">
+                                <div class="col-4 text-center">
+
+                                    <h4>团购列表</h4>
+                                </div>
+                                <div class="col-4">
+
+                                </div>
+                                <div class="col-2">
+
+                                </div>
+                                <div class=" col-2 text-center">
+
+                                    <button class="btn btn-primary ">发布团购</button>
+                                </div>
+                            </div>
+                            <div id="purchase_panel">
+
+                                <div class="row">
+
+                                    <div class="col-4 text-center">
+                                        团购标题
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        时间
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        发布者
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        发布者
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+               </div>
+
+                <div class="bg-white " id="publish_purchase_panel" style="position: fixed; display: none; padding: 4rem">
+                    <h2>发布团购页面</h2><br><br>
+                    <div >
+
+                        <form id="form">
+
+                            <div class="form-group">
+                                <label for="title">标题</label>
+                                <input type="text" class="form-control" name="title" id="title" placeholder="题目">
+                            </div>
+                            <div class="form-group">
+                                <label for="content">内容</label>
+                                <textarea class="form-control" rows="3" name="content" id="content" placeholder="文本内容"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="content">类型</label>
+                                <textarea class="form-control" rows="3" name="type" id="type" placeholder="文本内容"></textarea>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="end_date">结束时间</label>
+                                <input type="date" class="form-control" name="end_date" id="end_date" >
+                            </div>
+
+
+                            <button type="button" onclick="doSubmit()" class="btn btn-success">Submit</button>
+                            <button type="button" onclick="$('#publish_purchase_panel').fadeOut(500)" class="btn btn-success">取消发布</button>
+                            <span id="message"></span>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="bg-white " id="purchase_info_panel" style="position: fixed; display: none; padding: 2rem">
+                    <div class="container-fluid">
+                        <button class="btn btn-success float-right" onclick="$('#purchase_info_panel').fadeOut(500)">关闭</button>
+                    </div>
+                    <h2>活动详情页面</h2>
+                    <div class="row" >
+                        <div class="col-12 col-md-4">
+                            <h3 id="info_title"></h3>
+                            <p id="info_content">
+
+                            </p>
+                            <p class="text-muted">
+                                开始时间：
+                                <span id="info_start_date"></span><br/>
+                                -结束时间：
+                                <span id="info_end_date"></span>
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <h3>参与的同学</h3>
+                            <ul id="info_student_list">
+
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
 <!--底部内容-->
-<div id="footer">
-<script>$("#footer").load("footer.html")</script>
-</div>
-</div>
-		
+            <div id="footer">
+            <script>$("#footer").load("footer.html")</script>
+            </div>
+
 
 		
 	</body>
