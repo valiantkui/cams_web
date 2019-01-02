@@ -7,6 +7,7 @@ $.ajaxSetup({
     crossDomain: true,
 });
 var studentInfo = null;
+var domain = "http://localhost:8880";
 
     $.ajax({
         url: "http://localhost:8880/login/checkStudentSession",

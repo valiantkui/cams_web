@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>班级资料管理</title>
+
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-   <link rel="icon" href="img/logo2.png" >
-   <link rel="stylesheet" type="text/css" href="css/1s_data.css">
-  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
-  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
-  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
 		<style>
 		.position{
 			float:right;
@@ -27,18 +18,19 @@
 			$current=$(t);
 			//alert($current.parent());
 			$current.parent().addClass("active");
-			
+		}
+
+		function loadStudentInfo(){
 
 		}
 	</script>
 	
 	
-	</head>
-	<body>
 
-	<div class="container">
+
+	<div class="container-fluid">
 		
-		<div class="body_content" style="height: 1270px;">
+		<div  >
   <h2 class="h2_body" style="text-align: left;">学生资料管理</h2>
   <div class="position">
 		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal01" >修改密码</button>
@@ -87,16 +79,16 @@
   <form style="width: 400px;">
   <div class="form-group">
     <label for="exampleInputEmail1">学号</label>
-    <input type="number" class="form-control" id="exampleInputEmail1"  disabled="disabled">
+    <input type="number" class="form-control" name="s_id" id="s_id"  disabled="disabled">
   </div>
   
   <div class="form-group">
     <label for="exampleInputPassword1">姓名</label>
-    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="姓名">
+    <input type="text" class="form-control" name="name" id="name" placeholder="姓名">
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">职位</label>
-    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="职位" disabled="disabled">
+    <input type="text" class="form-control" id="post" placeholder="职位" disabled="disabled">
   </div>
   
   <div class="form-group">
@@ -117,5 +109,3 @@
    </div>
     
 </div>
-	</body>
-</html>

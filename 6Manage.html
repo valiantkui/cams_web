@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="icon" href="img/logo2.png" >
-   <link rel="stylesheet" type="text/css" href="css/6Manage.css">
+  <!-- <link rel="stylesheet" type="text/css" href="css/6Manage.css">-->
   <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
   <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
@@ -27,48 +27,39 @@
 			//alert($current.parent());
 			$current2.parent().addClass("active");
 		}
+
+        function SignOut(){
+            $.ajax({
+                url: "http://localhost:8880/login/studentLogout",
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                        window.location="SignIn.html";
+                    }else{
+                        alert("退出登陆失败");
+                    }
+                },
+                error: function(e){
+                    alert("网络请求异常");
+                }
+            });
+        }
 	</script>
 
 </head>
 	<body>
-		<!--导航栏-->
-			<div id="header">
-				<script>
-					$("#header").load("header.html");
-				</script>
-			</div>
-<!--轮播图-->
-<div class="container">
-  	<div class="row">
-  	<div class="col-12 col-md-3">
-  		<script>
-  			
-  			function reScreen(){
-  				  var windowWidth = $(window).width();
-					    if(windowWidth < 640){
-					        $("#second_nav").removeClass("flex-column");
-					    }
-					    if(windowWidth >= 640){
-					         $("#second_nav").addClass("flex-column");
-					    }
-  			}
-  				$(function(){
-  					reScreen();
-  				});
-  				
-  				 $(window).resize(function () {   
-  				 		reScreen();
-						});
-  			
-  		</script>
-<nav id="second_nav" class="navbar navbar-expand-lg flex-column  navbar-dark bg-dark" style="margin: 5px auto;">
+
+
+
+<nav  class="navbar navbar-expand-lg  navbar-dark bg-dark" >
 		
   	<a class="navbar-brand" href="#">后台管理系统</a>
-  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav1" 			aria-controls="navbarNav1" aria-expanded="false" aria-label="Toggle navigation">
+  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav1" aria-controls="navbarNav1" aria-expanded="false" aria-label="Toggle navigation">
   	  <span class="navbar-toggler-icon"></span>
   	</button>
-  <div class="collapse navbar-collapse " id="navbarNav1" style="height: 1210px;">
-    <ul class="navbar-nav nav flex-column">
+  <div class="collapse navbar-collapse " id="navbarNav1"    >
+    <ul class="navbar-nav nav ">
       <li class="nav-item active" >         <!--单击之后，在id=content中加载目录.html，单击也执行高亮的变化active-->
         <a id="current2" class="nav-link" onclick="$('#content').load('mulu1.html');loadContent2(this)">个人资料管理 <span class="sr-only"></span></a>
       </li>
@@ -76,33 +67,34 @@
         <a class="nav-link" onclick="$('#content').load('mulu2.html');loadContent2(this)">课件管理</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" onclick="$('#content').load('mulu3.html');loadContent2(this)">发布活动</a>
+        <a class="nav-link" onclick="$('#content').load('mulu3.html');loadContent2(this)">活动管理</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link " onclick="$('#content').load('mulu4.html');loadContent2(this)">发布团购</a>
+        <a class="nav-link " onclick="$('#content').load('mulu4.html');loadContent2(this)">管理团购</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link " onclick="$('#content').load('mulu5.html');loadContent2(this)">发布作业</a>
+        <a class="nav-link " onclick="$('#content').load('mulu5.html');loadContent2(this)">作业管理</a>
       </li>
     </ul>
   </div>
-  </div>
-  <div class="col-12 col-md-9 " id="content">
-	<h2>欢迎来到后台管理系统</h2><br />
-	<p>您可以放心管理后台内容，速度很快哦！！</p>
-	<img src="img/book3.PNG"/>
-</div>
-  </div>
+    <div class="position" >
+        <span id="studentInfo" class="text-white"></span>
+        <button type="button" class="btn btn-default btn-md"  id="sign_out" onclick="SignOut()">退出登陆</button>
+    </div>
+    <script src="js/checkStudentSession.js"></script>
+
 </nav>
 
-
+        <div class="container-fluid " id="content">
+            <h2>欢迎来到后台管理系统</h2><br />
+            <p>您可以放心管理后台内容，速度很快哦！！</p>
+            <img src="img/book3.PNG"/>
+        </div>
 <!--底部内容-->
-<div id="footer">
-<script>$("#footer").load("footer.html")</script>
-</div>
-</div>
-		</div>
 
-		
+        <div id="footer">
+            <script>$("#footer").load("footer.html")</script>
+        </div>
+
 	</body>
 </html>

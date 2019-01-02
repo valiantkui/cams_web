@@ -18,6 +18,9 @@
 	</style>
 
     <script>
+
+        var global_purchaseList = null;
+        var global_purchase = null;
         $(function(){
            //默认按发布时间排序，显示尚未截至的团购
             findAllInPurchase();
@@ -32,8 +35,8 @@
                success: function (result) {
                   // alert(result);
                    if(result != ""){
-
-                        loadPurchase($.parseJSON(result));
+                       global_purchaseList=$.parseJSON(result);
+                        loadPurchase(global_purchaseList);
                    }
                } ,
                 error: function (e) {
@@ -115,15 +118,182 @@
             $("#purchase_info_panel").css({"position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
 
             $("#purchase_info_panel").show();
+
+            var purchase = null;
+            for(var i = 0;i<global_purchaseList.length;i++){
+                if(global_purchaseList[i].p_no == p_no){
+                        purchase = global_purchaseList[i];
+                        break;
+                }
+            }
+            global_purchase = purchase;
+            $("#info_title").text(purchase.title);
+            $("#info_content").text(purchase.content);
+            $("#info_publish_date").text(purchase.publish_date);
+            $("#info_end_date").text(purchase.end_date);
+
+            findGoodsInfoByP_no(p_no);
+
+
+        }
+        function findGoodsInfoByP_no(p_no){
+            $.ajax({
+                url: "http://localhost:8880/purchase/findGoodsInfoByP_no?p_no="+p_no,
+                type: "get",
+                dataType: "text",
+                success: function (result) {
+                   // alert(result);
+                    var goodsInfoList = $.parseJSON(result);
+                    loadPurchaseGoods(goodsInfoList);
+                    loadGoodsInfo(goodsInfoList);
+
+                },
+                error: function (e) {
+                    alert("网络请求异常");
+                }
+
+
+            });
+
+        }
+        function loadPurchaseGoods(goodsInfoList){
+           // alert("当前登陆用户:"+studentInfo.s_id);
+            $("#tbody").empty();
+
+            for(var i = 0;i<goodsInfoList.length;i++){
+                var goods = goodsInfoList[i].goods;
+                var studentInfoList = goodsInfoList[i].studentInfoList;
+
+                var isJoined = false;//当前登陆学生是否团购了该物品
+                var goodsNum = -1;
+                for(var j = 0;j<studentInfoList.length;j++){
+                    var student = studentInfoList[j].student;
+                    if(student.s_id == studentInfo.s_id){
+                        isJoined = true;
+                        goodsNum = studentInfoList[j].number;
+                        break;
+                    }
+                }
+
+
+                var tr = document.createElement("tr");
+                var td_name = document.createElement("td");
+                var td_price = document.createElement("td");
+                var td_number = document.createElement("td");
+                var td_option = document.createElement("td");
+                $(td_name).text(goods.name);
+                $(td_price).text(goods.price+"元");
+                if(isJoined){
+                    $(td_number).append('<input type="number" class="form-control form-control-sm good_'+(goods.g_no)+'" readonly value="'+goodsNum+'" />');
+                    $(td_option).append('<button class="btn btn-sm btn-light" onclick="unjoinPurchaseGoods('+goods.g_no+')">已报名</button>');
+                }else{
+                    $(td_number).append('<input type="number" class="form-control form-control-sm good_'+(goods.g_no)+'" placeholder="数量" />');
+                    $(td_option).append('<button class="btn btn-sm btn-success" onclick="joinPurchaseGoods('+goods.g_no+')">报名</button>');
+
+                }
+                $(tr).append(td_name,td_price,td_number,td_option);
+                $("#tbody").append(tr);
+            }
+
         }
 
+        function unjoinPurchaseGoods(g_no){
+            //alert(g_no);
+            var p_no = global_purchase.p_no;
+            $.ajax({
+               url: "http://localhost:8880/purchase/unjoinPurchaseGoods?g_no="+g_no,
+               type: "get",
+               dataType: "text",
+               success: function (result) {
+                   if(result == "true"){
+                       findGoodsInfoByP_no(p_no);
+                   }else{
+                       alert("取消失败");
+                   }
+               } ,
+                error: function (e) {
+                    alert("网络请求异常");
+                }
+
+            });
+        }
+
+        function loadGoodsInfo(goodsInfoList){
+
+            $("#info_student_list").empty();
+            for(var i = 0;i<goodsInfoList.length;i++){
+                var goods = goodsInfoList[i].goods;
+                var studentInfoList = goodsInfoList[i].studentInfoList;
+
+
+                var div_row = document.createElement("div");
+                $(div_row).addClass("row");
+                var div_col_name = document.createElement("div");
+                $(div_col_name).addClass("col");
+                var div_col_price = document.createElement("div");
+                $(div_col_price).addClass("col");
+                var div_col_stuNum = document.createElement("div");
+                $(div_col_stuNum).addClass("col");
+                var div_col_goodsNum = document.createElement("div");
+                $(div_col_goodsNum).addClass("col");
+                $(div_col_name).text(goods.name);
+                $(div_col_price).text(goods.price);
+                $(div_col_stuNum).text(studentInfoList.length);
+                $(div_row).append(div_col_name,div_col_price,div_col_stuNum,div_col_goodsNum);
+
+
+                var div_container = document.createElement("div");
+                $(div_container).addClass("container");
+
+                var allGoodsNum = 0;
+                for(var j = 0;j<studentInfoList.length;j++){
+                    var studentInfo = studentInfoList[j];
+                    allGoodsNum += studentInfo.number;
+                    var student = studentInfo.student;
+                    var span = document.createElement("span");
+                    $(span).addClass("badge badge-light");
+                    $(span).text(student.name+"|"+studentInfo.number+"件");
+                    $(div_container).append(span);
+                }
+                $(div_col_goodsNum).text(allGoodsNum);
+                $("#info_student_list").append(div_row,div_container,"<hr/>");
+            }
+        }
+        function joinPurchaseGoods(g_no) {
+            var number = $(".good_"+g_no).val();
+            var p_no = global_purchase.p_no;
+            if(number.trim()==""){
+                alert('请输入数量');
+                return ;
+            }
+
+            $.ajax({
+                url: "http://localhost:8880/purchase/joinPurchaseGoods",
+                type: "post",
+                data: {"g_no":g_no,"number":number,"p_no":p_no},
+                dataType: "text",
+                success: function (result) {
+                    if(result == "true"){
+                        findGoodsInfoByP_no(p_no);
+                    }else{
+                        alert("参与失败");
+                    }
+
+
+                },
+                error: function (e) {
+                    alert("网络请求异常");
+                }
+            });
+
+        }
 
         function publishPurchase(){
 
             var maxw = document.documentElement.clientWidth;
             var maxh = document.documentElement.clientHeight;
             //alert(maxw+",,"+maxh);
-            $("#publish_purchase_panel").css({"position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#publish_purchase_panel").css({"position":"fixed",width: maxw+"px",height: maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
 
             $("#publish_purchase_panel").show();
 
@@ -134,7 +304,64 @@
             var content = $("#title").val();
             var type = $("#type").val();
             var end_date = $("#end_date").val();
+            var goods = $("#goods").val();
+            var price = $("#price").val();
 
+            if(title=="" || content =="" || type=="" || goods.trim()=="" || price.trim() == "" || end_date == ""){
+                $("#message").text("请输入完整");
+                $("#message").css({"color":"red"});
+                return;
+            }
+            var formData = new FormData(document.getElementById("form"));
+
+            $.ajax({
+               url:"http://localhost:8880/purchase/publishPurchase",
+                type:"post",
+                dataType:"text",
+                data:formData,
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    if(result == "true"){
+                        alert('发布成功');
+                        $("#publish_purchase_panel").fadeOut(500);
+                        findAllInPurchase();
+                    }
+                },
+                error: function (e) {
+                   alert("网络请求异常");
+
+                }
+            });
+
+
+
+        }
+
+        function addGoods() {
+            var inputs = $(".goods_list:last input");
+            var goods = $(inputs[0]).val();
+            var price = $(inputs[1]).val();
+            if (goods.trim() == "" || price.trim() == "") {
+                return;
+            }
+
+            var div_row = document.createElement("div");
+            $(div_row).addClass("row goods_list");
+            var div_goods = document.createElement("div");
+            $(div_goods).addClass("col-7 col-md-4");
+            var div_separator = document.createElement("div");
+            $(div_separator).addClass("col-md-1 d-none");
+            var div_price = document.createElement("div");
+            $(div_price).addClass("col-4 col-md-2");
+            $(div_goods).append('<input type="text" class="form-control" name="goods" placeholder="团购商品"/>')
+            $(div_separator).append("--");
+            $(div_price).append('<input type="number" class="form-control" name="price" placeholder="单价"/>');
+
+
+            $(div_row).append(div_goods,div_separator,div_price);
+
+            $(".goods_list:last").after(div_row);
 
 
 
@@ -142,7 +369,7 @@
     </script>
 
 </head>
-	<body>
+	<body style="position: relative;">
 		<!--导航栏-->
 			<div id="header">
 				<script>
@@ -176,7 +403,7 @@
                                 </div>
                                 <div class=" col-2 text-center">
 
-                                    <button class="btn btn-primary ">发布团购</button>
+                                    <button class="btn btn-primary " onclick="publishPurchase()">发布团购</button>
                                 </div>
                             </div>
                             <div id="purchase_panel">
@@ -202,7 +429,7 @@
                     </div>
                </div>
 
-                <div class="bg-white " id="publish_purchase_panel" style="position: fixed; display: none; padding: 4rem">
+                <div class="bg-white " id="publish_purchase_panel" style="position: fixed;z-index: 99; display: none; padding: 4rem;overflow-y: auto">
                     <h2>发布团购页面</h2><br><br>
                     <div >
 
@@ -218,9 +445,22 @@
                             </div>
                             <div class="form-group">
                                 <label for="content">类型</label>
-                                <textarea class="form-control" rows="3" name="type" id="type" placeholder="文本内容"></textarea>
+                                <input class="form-control" name="type" id="type" placeholder="文本内容"></input>
                             </div>
-
+                            <div class="form-group">
+                                <label for="content">团购物品</label><button class="btn btn-success btn-sm" onclick="addGoods()" type="button">添加</button>
+                                <div class="row goods_list">
+                                    <div class="col-7 col-md-4">
+                                        <input  type="text" class="form-control" name="goods" id="goods" placeholder="团购物品"/>
+                                    </div>
+                                    <div class="col-md-1 d-none">
+                                        --
+                                    </div>
+                                    <div class="col-4 col-md-2">
+                                        <input type="number" class="form-control" name="price" id="price" placeholder="单价"/>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="form-group">
                                 <label for="end_date">结束时间</label>
@@ -228,36 +468,55 @@
                             </div>
 
 
-                            <button type="button" onclick="doSubmit()" class="btn btn-success">Submit</button>
+                            <button type="button" onclick="doPublish()" class="btn btn-success">发布</button>
                             <button type="button" onclick="$('#publish_purchase_panel').fadeOut(500)" class="btn btn-success">取消发布</button>
                             <span id="message"></span>
                         </form>
                     </div>
                 </div>
 
-                <div class="bg-white " id="purchase_info_panel" style="position: fixed; display: none; padding: 2rem">
+                <div class="bg-white " id="purchase_info_panel" style="position: absolute; display: none; padding: 2rem">
                     <div class="container-fluid">
                         <button class="btn btn-success float-right" onclick="$('#purchase_info_panel').fadeOut(500)">关闭</button>
                     </div>
                     <h2>活动详情页面</h2>
                     <div class="row" >
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <h3 id="info_title"></h3>
                             <p id="info_content">
 
                             </p>
                             <p class="text-muted">
-                                开始时间：
-                                <span id="info_start_date"></span><br/>
+                                发布时间：
+                                <span id="info_publish_date"></span><br/>
                                 -结束时间：
                                 <span id="info_end_date"></span>
                             </p>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <h3>参与的同学</h3>
-                            <ul id="info_student_list">
+                            <table class="table">
+                                <tr>
+                                    <td>团购物品</td> <td>物品单价</td> <td>数量</td> <td>操作</td>
+                                </tr>
+                                <tbody id="tbody">
+                                    <tr>
 
-                            </ul>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <h3>团购参与情况</h3>
+                            <div class="row" style="font-size: 20px;">
+                                <div class="col">团购物品</div>
+                                <div class="col">单价</div>
+                                <div class="col">总人数</div>
+                                <div class="col">物品总数</div>
+                            </div>
+
+                            <div id="info_student_list" style="border: 1px solid #1E9FFF;">
+
+                            </div>
 
                         </div>
                     </div>
